@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 
 # Page Setup
-st.set_page_config(page_title="Tactical AI Scouting", layout="wide")
+st.set_page_config(page_title="AI Football Scout", layout="wide")
 st.title("⚽ AI Football Scout")
 st.markdown("Upload a CSV of player event data to instantly find statistical fits for your tactical system.")
 
@@ -33,6 +33,8 @@ with st.expander("📖 How to use this app & Dataset Requirements"):
     `touches_in_box_per90`, `pass_completion_pct`, `pressure_receipt_pct`, `final_third_pressures_per90`, `counterpressures_per90`, `high_ball_recoveries_per90`, `explosive_carries_per90`, `avg_shot_quality`, `aerial_duels_won_per90`, `avg_receipt_distance_from_goal`
     
     *Tip: For the most accurate results, ensure players with low minutes played are filtered out before uploading.*
+                
+    *This model was trained using the Statsbomb open database which is very limited. A lot of the training data is from 2015/2016 so results may not be perfect if more modern datasets are loaded. The demo dataset also uses this data, and may copies of the same player from different seasons.*
     """)
 
 # Load the saved models and scalers and cache them to improve performance
@@ -61,7 +63,7 @@ uploaded_file = st.sidebar.file_uploader("Upload Player Data (CSV)", type=["csv"
 
 st.sidebar.markdown("**Don't have a dataset?**")
 # Demo button
-use_demo_data = st.sidebar.button("📊 Load Demo Dataset (2015/16)")
+use_demo_data = st.sidebar.button("📊 Load Demo Dataset")
 
 # Feature definitions (same as in training)
 positional_features = {
