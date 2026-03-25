@@ -7,6 +7,10 @@ st.set_page_config(page_title="AI Football Scout", layout="wide")
 st.title("⚽ AI Football Scout")
 st.markdown("Upload a CSV of player event data to instantly find statistical fits for your tactical system.")
 
+# Initialise session state so demo dataset doesn't unload
+if 'use_demo_data' not in st.session_state:
+    st.session_state.use_demo_data = False
+
 # Documentation and Instructions
 with st.expander("📖 How to use this app & Dataset Requirements"):
     st.markdown("""
@@ -39,13 +43,13 @@ with st.expander("📖 How to use this app & Dataset Requirements"):
 
 # Load the saved models and scalers and cache them to improve performance
 @st.cache_resource
-def load_ai_brain():
+def load_ai_models():
     models = joblib.load("scouting_models.pkl")
     scalers = joblib.load("tactical_scalers.pkl")
     return models, scalers
 
 try:
-    models, scalers = load_ai_brain()
+    models, scalers = load_ai_models()
 except Exception as e:
     st.error(f"⚠️ Could not load models. Make sure 'scouting_models.pkl' and 'tactical_scalers.pkl' are in the same folder as this app. Error: {e}")
     st.stop()
@@ -63,7 +67,12 @@ uploaded_file = st.sidebar.file_uploader("Upload Player Data (CSV)", type=["csv"
 
 st.sidebar.markdown("**Don't have a dataset?**")
 # Demo button
-use_demo_data = st.sidebar.button("📊 Load Demo Dataset")
+# use_demo_data = st.sidebar.button("📊 Load Demo Dataset")
+
+# Demo button logic
+if st.sidebar.button("📊 Load Demo Dataset"):
+    # When clicked, flip the memory flag to true
+    st.session_state.use_demo_data = True
 
 # Feature definitions (same as in training)
 positional_features = {
@@ -87,7 +96,7 @@ positional_features = {
 }
 
 # Main logic
-if uploaded_file is not None or use_demo_data:
+if uploaded_file is not None or st.session_state.use_demo_data:
 
     if uploaded_file is not None:
         # Read the uploaded dataset
@@ -97,7 +106,7 @@ if uploaded_file is not None or use_demo_data:
         df = pd.read_csv("Combined_Dataset_Final.csv")
         st.sidebar.success("Demo dataset loaded successfully!")
 
-    # Deal with blank columns titles (eg player name not having a title like in the demo dataset)
+    # Deal with blank columns titles (e.g. player name not having a title like in the demo dataset)
     if "Unnamed: 0" in df.columns:
         # If player_name is missing rename it
         if "player_name" not in df.columns:
