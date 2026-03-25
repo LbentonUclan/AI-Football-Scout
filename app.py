@@ -10,7 +10,7 @@ st.markdown("Upload a CSV of player event data to instantly find statistical fit
 # Documentation and Instructions
 with st.expander("📖 How to use this app & Dataset Requirements"):
     st.markdown("""
-    ### Welcome to the AI Tactical Scouting Engine
+    ### Welcome to the AI Football Scout
     This tool uses Machine Learning to evaluate player event data and find perfect statistical fits for specific tactical systems.
     
     #### 📁 Dataset Requirements
@@ -160,11 +160,14 @@ if uploaded_file is not None or use_demo_data:
         X_scaled = active_scaler.transform(X_raw)
         
         # Make the predictions
-        position_df["Fit_Prediction"] = active_model.predict(X_scaled)
+        # position_df["Fit_Prediction"] = active_model.predict(X_scaled)
         
         # Ask the model exactly which column holds the '1' (Fit) probability
         fit_class_index = list(active_model.classes_).index(1)
         position_df["Confidence_Score"] = active_model.predict_proba(X_scaled)[:, fit_class_index]
+
+        # Force the prediction to be strictly based on the 50% confidence threshold
+        position_df["Fit_Prediction"] = (position_df["Confidence_Score"] >= 0.50).astype(int)
         
         # 4. Filter to only show players the model says are a Fit
         recommended_players = position_df[position_df["Fit_Prediction"] == 1]
