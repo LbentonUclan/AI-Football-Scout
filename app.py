@@ -101,6 +101,7 @@ if uploaded_file is not None or st.session_state.use_demo_data:
     if uploaded_file is not None:
         # Read the uploaded dataset
         df = pd.read_csv(uploaded_file)
+        st.session_state.use_demo_data = False
     else:
         # Load the demo dataset
         df = pd.read_csv("Combined_Dataset_Final.csv")
